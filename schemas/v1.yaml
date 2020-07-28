@@ -1,0 +1,400 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Enhanced Bangumi API
+  description: An enhanced Bangumi API.
+servers:
+  - url: 'https://bgmapi.bmao.tech/v1'
+paths:
+  /subjects:
+    get:
+      description: Returns all subjects.
+      responses:
+        '200':
+          description: Successfully returned a list of all subjects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectSimple'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}:
+    get:
+      description: Returns the subject by subject ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+      responses:
+        '200':
+          description: Successfully returned the subject
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectDetailed'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}/eps:
+    get:
+      description: Returns the subject by subject ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+      responses:
+        '200':
+          description: Successfully returned the subject
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectDetailed'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}/eps/{episodeId}:
+    get:
+      description: Returns the episode by subject ID and episode ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+        - $ref: '#/components/parameters/EpisodeId'
+      responses:
+        '200':
+          description: Successfully returned the episode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Episode'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}/eps/{episodeId}/sources:
+    get:
+      description: Returns all episode sources by subject ID and episode ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+        - $ref: '#/components/parameters/EpisodeId'
+      responses:
+        '200':
+          description: Successfully returned all episode sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EpisodeSource'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}/eps/{episodeId}/sources/{serviceId}:
+    get:
+      description: Returns the episode source by subject ID, episode ID and service ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+        - $ref: '#/components/parameters/EpisodeId'
+        - $ref: '#/components/parameters/ServiceId'
+      responses:
+        '200':
+          description: Successfully returned the episode source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpisodeSource'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}/sources:
+    get:
+      description: Returns all subject sources by subject ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+      responses:
+        '200':
+          description: Successfully returned all subject sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectSource'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /subjects/{subjectId}/sources/{serviceId}:
+    get:
+      description: Returns the subject source by subject ID and service ID.
+      parameters:
+        - $ref: '#/components/parameters/SubjectId'
+        - $ref: '#/components/parameters/ServiceId'
+      responses:
+        '200':
+          description: Successfully returned the subject source
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectSource'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+components:
+  schemas:
+    SubjectSimple:
+      type: object
+      properties:
+        id:
+          type: integer
+        name_jp:
+          type: string
+        name_cn:
+          type: string
+        name_en:
+          type: string
+        on_air_date:
+          type: string
+          format: date-time
+        website:
+          type: string
+          format: uri
+        bgm_url:
+          type: string
+          format: uri
+        mal_url:
+          type: string
+          format: uri
+          nullable: true
+        bgm_image_url:
+          type: string
+          format: uri
+          nullable: true
+        api_ref:
+          type: string
+          pattern: '^\/v1\/subjects\/\d+$'
+    SubjectDetailed:
+      type: object
+      properties:
+        id:
+          type: integer
+        name_jp:
+          type: string
+        name_cn:
+          type: string
+        name_en:
+          type: string
+        on_air_date:
+          type: string
+          format: date-time
+        website:
+          type: string
+          format: uri
+        bgm_url:
+          type: string
+          format: uri
+        mal_url:
+          type: string
+          format: uri
+          nullable: true
+        bgm_image_url:
+          type: string
+          format: uri
+          nullable: true
+        summary:
+          type: string
+        eps:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              type:
+                type: integer
+                minimum: 0
+                maximum: 6
+              sort:
+                type: number
+                minimum: 0
+              name:
+                type: string
+              name_cn:
+                type: string
+              duration:
+                type: partial-time
+              airdate:
+                type: string
+                format: date
+              desc:
+                type: string
+              status:
+                type: string
+              sources:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    service_id:
+                      type: string
+                    episode_url:
+                      type: string
+                      format: uri
+                      nullable: true
+                    video_url:
+                      type: string
+                      format: uri
+                      nullable: true
+                    api_ref:
+                      type: string
+                      pattern: '^\/v1\/subjects\/\d+\/eps\/\d+\/sources\/[0-9a-z\._]+$'
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubjectSource'
+    Episode:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: integer
+          minimum: 0
+          maximum: 6
+        sort:
+          type: number
+          minimum: 0
+        name:
+          type: string
+        name_cn:
+          type: string
+        duration:
+          type: partial-time
+        airdate:
+          type: string
+          format: date
+        desc:
+          type: string
+        status:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/EpisodeSource'
+    EpisodeSource:
+      type: object
+      properties:
+        service_id:
+          type: string
+        localized_name:
+          type: string
+        authorized:
+          type: boolean
+        paid:
+          type: integer
+          minimum: 0
+          maximum: 2
+        episode_url:
+          type: string
+          format: uri
+          nullable: true
+        video_url:
+          type: string
+          format: uri
+          nullable: true
+        subtitle_locales:
+          type: array
+          items:
+            type: string
+            pattern: '^[a-z]{2}_[A-Z]{2}$'
+        api_ref:
+          type: string
+          pattern: '^\/v1\/subjects\/\d+\/eps\/\d+\/sources\/[0-9a-z\._]+$'
+    SubjectSource:
+      type: object
+      properties:
+        service_id:
+          type: string
+        localized_name:
+          type: string
+        authorized:
+          type: boolean
+        paid:
+          type: integer
+          minimum: 0
+          maximum: 2
+        subject_url:
+          type: string
+          format: uri
+          nullable: true
+        subtitle_locales:
+          type: array
+          items:
+            type: string
+            pattern: '^[a-z]{2}_[A-Z]{2}$'
+        api_ref:
+          type: string
+          pattern: '^\/v1\/subjects\/\d+\/sources\/[0-9a-z\._]+$'
+
+  parameters:
+    SubjectId:
+      name: subjectId
+      in: path
+      required: true
+      description: Specifies subject ID
+      schema:
+        type: integer
+        minimum: 1
+    EpisodeId:
+      name: episodeId
+      in: path
+      required: true
+      description: Specifies episode ID
+      schema:
+        type: integer
+        minimum: 1
+    ServiceId:
+      name: serviceId
+      in: path
+      required: true
+      description: Specifies service ID
+      schema:
+        type: string
+        pattern: '^[0-9a-z\._]+$'
+
+  responses:
+    404Error:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                minimum: 404
+                maximum: 404
+              message:
+                type: string
+    500Error:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                minimum: 500
+                maximum: 500
+              message:
+                type: string

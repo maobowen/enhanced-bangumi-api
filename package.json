@@ -1,0 +1,41 @@
+{
+  "name": "enhanced-bangumi-api",
+  "version": "1.0.20200727",
+  "description": "Enhanced Bangumi APIs",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maobowen/enhanced-bangumi-api.git"
+  },
+  "author": "Bowen Mao",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/maobowen/enhanced-bangumi-api/issues"
+  },
+  "homepage": "https://github.com/maobowen/enhanced-bangumi-api#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "debug": "^4.1.1",
+    "express": "^5.0.0-alpha.1",
+    "http-errors": "^1.8.0",
+    "morgan": "^1.10.0",
+    "node-fetch": "^2.6.0",
+    "pg": "^8.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "eslint": "^7.5.0",
+    "gulp": "^4.0.2",
+    "gulp-eslint": "^6.0.0",
+    "gulp-shell": "^0.8.0",
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0",
+    "supertest": "^4.0.2"
+  }
+}

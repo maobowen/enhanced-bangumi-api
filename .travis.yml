@@ -1,0 +1,39 @@
+language: node_js
+node_js: node
+os: linux
+dist: focal
+env:
+  global:
+    - NODE_ENV=test
+    - PGUSER=postgres
+    - PGPASSWORD=postgres
+    - LOCAL_DATABASE=enhanced_bangumi_api
+    - DATABASE_URL=postgresql://${PGUSER}:${PGPASSWORD}@localhost:5432/${LOCAL_DATABASE}
+    - HEROKU_APP=enhanced-bangumi-api
+addons:
+  postgresql: '12'
+cache:
+  npm: false
+before_install:
+  - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/12/main/postgresql.conf
+  - sudo systemctl start postgresql@12-main
+before_script:
+  - psql -c "ALTER USER ${PGUSER} PASSWORD '${PGPASSWORD}';"
+  - psql -c "CREATE DATABASE ${LOCAL_DATABASE};"
+  - git clone https://github.com/maobowen/enhanced-bangumi-api-data.git
+  - cd enhanced-bangumi-api-data && bash import.sh && cd .. && rm -rf enhanced-bangumi-api-data
+  - npm i -g gulp-cli
+after_success:
+  - npm i -g coveralls
+  - nyc report --reporter=text-lcov | coveralls
+before_deploy:
+  - if [ -z ${HEROKU_API_KEY+x} ]; then echo "HEROKU_API_KEY is not set" && exit 1; fi
+  - if [ -z ${HEROKU_DATABASE+x} ]; then echo "HEROKU_DATABASE is not set" && exit 1; fi
+  - curl https://cli-assets.heroku.com/install.sh | sudo sh
+  - heroku pg:reset ${HEROKU_DATABASE} --app ${HEROKU_APP} --confirm ${HEROKU_APP}
+  - heroku pg:push ${LOCAL_DATABASE} ${HEROKU_DATABASE} --app ${HEROKU_APP}
+deploy:
+  provider: heroku
+  api_key:  # travis encrypt $(heroku auth:token) --add deploy.api_key --pro -r maobowen/enhanced-bangumi-api
+    secure: fHJ9ZR8Pfa6UJV1f3N29z33HALlg2+W3m3AM9AaKNxg9H/ZhTbCxv9CMqZGXxqeeEWbZIxfvxuGcd+7Sh+g6JHhIxbQt7z8E2Nay9ZJOJEvUQ33LeXbIT7VAehw+vYA0d9p8j1wvmkuUm7n9lKVpptKgNewkcW6esGGIuwFOd5aOIfQx3OhDLG4KEB48yThWE5C4AmiHUFBgFMx9TUguhVk3M+clYdD3CD7eEktvxsnD0GCCtHkXYhpRA0ZbyaKfEc9LhYIxCV2dLpEpc50uWnBl1cEpNGOs821l2Yd6KnVjezCjcX/TLhN9FVVeqyV5WMejWso3vPH5Ov9jLvtxV8MPd6+e/vvnUXi1bX8hP7WHYtsvY3sSTW7CETl1IuhcE3I0U2DWtylHQ8mJTkGwFqIMtt9V53cj2fVSSXuDcN/zW/3yY3t5+2OhLGUktp1f4RJImnSRMdliWrGODSmsAqd/JZ79QBpr9fgSlnipyn9HTsnQr8FyLdD2j45LTRi3qWEBAS37oeJNFySiC0fF2FxNZ1X1wHRr+AH3lpnQ0l9vACBlmVsRX1/yg0OFywtgyU7dynNtM4lCw21TdrEc1XEJLZaXkc82PH1yQeaonz0QwuXgl1xtFS6/Khc5Anu+X9CSa4p+7orxog8w2Uvf3xFrMpy8xwh3mxv6+w2fFW4=
+  app: enhanced-bangumi-api
